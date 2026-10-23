@@ -207,3 +207,97 @@ marquée « en cours » n'est pas encore tranchée.
     centrales pour l'Allemagne et l'Espagne.
   - Aucune des deux sources n'est donc satisfaisante telle quelle ; le choix de la source
     quotidienne reste ouvert.
+
+## D10. Les séries des banques centrales comme source des spreads (2026-10-23, en cours)
+
+- **Option étudiée.** Calculer les spreads avec les séries quotidiennes des banques
+  centrales : France-Allemagne = TEC 10 (Banque de France) - Bundesbank ; France-Espagne =
+  TEC 10 - Banco de España. Sources publiques, officielles, proches de la série mensuelle
+  de la BCE (0,006 à 0,041 point de %), couvrant 2016 au 15 juin 2026 pour les trois pays.
+- **Contradiction avec D5.** Les trois séries ne sont pas construites de la même façon
+  (TEC 10 interpolé entre OAT cotées ; courbe estimée par un modèle pour la Bundesbank ;
+  marché secondaire pour le Banco de España) et ne sont peut-être pas relevées à la même
+  heure. Mais aucune source disponible ne respecte D5 au sens strict : depuis juillet
+  2024, le spread France-Allemagne d'Eurostat est lui-même « TEC 10 moins une série
+  allemande alignée sur la Bundesbank » (D9).
+- **Ces séries reflètent-elles le marché ? Oui pour les grands mouvements et sur plusieurs
+  jours, non pour les petites variations d'un jour.**
+  - Corrélation des variations du spread France-Allemagne entre sources, de 2016 à juin
+    2024 : 0,13 à 0,33 sur 1 jour, 0,28 à 0,56 sur 2 jours, 0,47 à 0,73 sur 5 jours,
+    0,61 à 0,80 sur 10 jours. Même ordre de grandeur pour France-Espagne (0,16 à 0,47 sur
+    1 jour, 0,65 à 0,76 sur 10 jours). Un spread est la petite différence de deux grands
+    taux : quelques pb d'écart de mesure sur chaque jambe ont la taille de sa variation
+    quotidienne typique (environ 3,5 pb, D7).
+  - Contrôle sur un grand mouvement daté indépendamment des données, la dissolution du 9
+    juin 2024 : du 7 au 14 juin 2024, le spread France-Allemagne s'élargit de 27 pb selon
+    les banques centrales, 20 pb selon Eurostat et 32 pb selon CNBC. Les trois sources
+    montrent le même choc ; elles divergent sur son ampleur exacte (± 6 pb) et sur son
+    profil jour par jour. Sur France-Espagne, le mouvement est petit et les sources ne
+    s'accordent pas (+1 à +12 pb).
+  - Les séries de la Banque de France et de la Bundesbank sont publiées au centième de
+    point de % : le spread national a une résolution de 1 pb.
+- **Conséquences pour l'étude d'événements (à décider).** Mesurer la réaction sur une
+  fenêtre de plusieurs jours plutôt que sur un seul jour ; ne pas interpréter un
+  mouvement de quelques pb ; vérifier chaque résultat avec une seconde source (Eurostat
+  jusqu'en avril 2025, CNBC ensuite).
+- **Vérification de l'heure de relevé (2026-10-23).**
+  - **Banque de France, TEC 10 : 11 h, heure de Paris.** Note technique sur les indices
+    CNO-TEC, révision du 07/05/2020, p. 6 : « Chaque indice CNO-TEC du jour j est calculé à
+    partir des prix de MTS relevés à 11 heures. » P. 7 : « la Banque de France se voit
+    communiquer à 11h par MTS [...] les prix des titres présentant sur le marché la
+    fourchette bid/ask la plus [étroite] ». Publication « j vers 11 heures 30 » (p. 10).
+    https://www.banque-france.fr/system/files/2024-07/TEC%20Note%20Technique%20-%20Version%20r%C3%A9vis%C3%A9e%20FR%2020200507.pdf
+  - **Bundesbank : vers midi.** Page « Kurse und Renditen börsennotierter
+    Bundeswertpapiere » : « Um die Mittagszeit wird für jedes Papier der sogenannte
+    Einheitspreis (bzw. seit 23.05.2011 an der Frankfurter Wertpapierbörse der
+    Bundesbank-Referenzpreis) ermittelt. » Les rendements quotidiens publiés ont pour
+    « Basis: Bundesbank-Referenzpreise der Frankfurter Wertpapierbörse » (communiqué du
+    06/10/2026). La courbe estimée repose sur « die Kurse von Bundesanleihen,
+    Bundesobligationen und Bundesschatzanweisungen » : que ce soient ces mêmes prix de
+    midi est probable mais n'est pas écrit explicitement.
+    https://www.bundesbank.de/dynamic/action/de/service/bundeswertpapiere/kurse-und-renditen/810554/kurse-und-renditen-boersennotierter-bundeswertpapiere
+  - **Banco de España, TI 1.3 : non vérifié.** Les métadonnées du fichier indiquent
+    « Tipos de interés. Del mercado secundario de valores. Bonos y obligaciones del Estado
+    no segregados. 10 Años. Conjunto del mercado. Operaciones simples al contado », source
+    « Bolsas y Mercados Españoles ». Cela suggère un taux tiré des transactions de la
+    journée, sans doute une moyenne, et non un relevé à heure fixe ; nous n'avons pas
+    trouvé de note qui le dise. Le tableau 22.7 du Boletín Estadístico n'affiche plus de
+    montants négociés à partir de mars 2025, ce qui peut signaler un changement de source.
+  - **Conséquences.** Aucune des trois séries n'est un taux de clôture. Pour le spread
+    France-Allemagne, les deux relevés sont proches (11 h et vers midi) : la journée de
+    marché de ce spread va d'environ 11 h-12 h la veille à 11 h-12 h le jour même, et un
+    événement survenu après 11 h le jour J ne peut apparaître qu'en J+1. Pour le spread
+    France-Espagne, un relevé à 11 h est comparé à une série probablement moyennée sur la
+    journée : la compatibilité n'est pas établie. Depuis juillet 2024, la série Eurostat
+    pour la France est le TEC 10, donc elle aussi relevée à 11 h.
+
+## D11. Source des spreads : les séries des banques centrales (2026-10-23)
+
+- **Décision.** Nos spreads sont calculés avec les séries quotidiennes des banques
+  centrales : France-Allemagne = TEC 10 (Banque de France) - Bundesbank ; France-Espagne =
+  TEC 10 - Banco de España (TI 1.3). La période commune aux trois séries va du 4 janvier
+  2016 au 15 juin 2026 (dernière valeur du TEC 10 dans nos données). CNBC et Eurostat
+  restent dans le rapport comme contrôles de robustesse.
+- **Assouplissement de D5.** Les deux jambes d'un spread ne viennent plus de la même
+  source. Nous l'acceptons parce qu'aucune source disponible ne respecte D5 au sens
+  strict (D9), et parce que ces séries sont publiques, officielles, proches de la série
+  mensuelle de la BCE et couvrent toute la période.
+- **Heure de référence.** Le TEC 10 est relevé à 11 h et la Bundesbank fixe ses prix vers
+  midi (D10). Nous retenons pour le spread France-Allemagne une journée de marché qui se
+  termine vers 11 h-12 h, heure de Paris : un événement survenu après 11 h le jour J est
+  rattaché au jour de marché J+1.
+- **Alternatives écartées.** CNBC (pas aligné sur les banques centrales pour l'Allemagne
+  et l'Espagne, source non publique, D7 et D9) ; Eurostat (s'arrête en avril 2025 et
+  change de source pour la France en juillet 2024, D9).
+- **Biais introduits.**
+  - Méthodes différentes d'une jambe à l'autre : OAT fictive interpolée (TEC 10), courbe
+    estimée par un modèle (Bundesbank), taux de marché secondaire (Banco de España). Une
+    partie des variations quotidiennes du spread vient de ces différences, pas du marché.
+  - Le spread France-Espagne compare un relevé à 11 h à une série dont l'heure n'est pas
+    vérifiée, probablement une moyenne des transactions de la journée : sa réaction à un
+    événement peut être étalée ou décalée d'un jour.
+  - Aucun relevé n'est une clôture : un événement de l'après-midi n'apparaît que le
+    lendemain.
+  - Avec une résolution de 1 pb et un désaccord entre sources de l'ordre de la variation
+    quotidienne typique (D7, D10), nous mesurerons les réactions sur plusieurs jours et
+    n'interpréterons pas un mouvement de quelques pb.

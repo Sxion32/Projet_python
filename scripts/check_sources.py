@@ -22,19 +22,19 @@ import io
 import pandas as pd
 import requests
 
-START = "2018-01-01"
+START = "2016-01-01"
 END = "2026-09-30"
-COUNTRIES = ["DE", "FR", "IT", "ES", "PT", "BE", "NL"]
+COUNTRIES = ["DE", "FR", "ES"]  # Allemagne (dénominateur du spread), France, Espagne
 MIN_DAYS_PER_MONTH = 15  # un mois n'est comparé que s'il compte au moins 15 cotations
 
 EUROSTAT_URL = (
     "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/"
-    "irt_lt_mcby_d?format=SDMX-CSV&startPeriod=2018-01-01"
+    f"irt_lt_mcby_d?format=SDMX-CSV&startPeriod={START}"
 )
 DBNOMICS_URL = "https://api.db.nomics.world/v22/series/{series}?observations=1"
 ECB_URL = (
     "https://data-api.ecb.europa.eu/service/data/IRS/"
-    "M.{countries}.L.L40.CI.0000.EUR.N.Z?format=csvdata&startPeriod=2018-01"
+    "M.{countries}.L.L40.CI.0000.EUR.N.Z?format=csvdata&startPeriod=" + START[:7]
 )
 BUNDESBANK_URL = (
     "https://www.bundesbank.de/statistic-rmi/StatisticDownload"

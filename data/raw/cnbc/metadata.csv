@@ -1,0 +1,4 @@
+symbole,url,telecharge_le_utc
+FR10Y-FR,https://ts-api.cnbc.com/harmony/app/bars/FR10Y-FR/1D/20160101000000/20261023000000/adjusted/EST5EDT.json,2026-10-23T14:04:45+00:00
+DE10Y-DE,https://ts-api.cnbc.com/harmony/app/bars/DE10Y-DE/1D/20160101000000/20261023000000/adjusted/EST5EDT.json,2026-10-23T14:04:45+00:00
+ES10Y-ES,https://ts-api.cnbc.com/harmony/app/bars/ES10Y-ES/1D/20160101000000/20261023000000/adjusted/EST5EDT.json,2026-10-23T14:04:45+00:00

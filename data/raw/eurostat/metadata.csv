@@ -1,0 +1,4 @@
+pays,url,telecharge_le_utc
+FR,https://api.db.nomics.world/v22/series/Eurostat/IRT_LT_MCBY_D/D.MCBY.FR?observations=1,2026-10-23T14:04:47+00:00
+DE,https://api.db.nomics.world/v22/series/Eurostat/IRT_LT_MCBY_D/D.MCBY.DE?observations=1,2026-10-23T14:04:47+00:00
+ES,https://api.db.nomics.world/v22/series/Eurostat/IRT_LT_MCBY_D/D.MCBY.ES?observations=1,2026-10-23T14:04:47+00:00

@@ -1,0 +1,4 @@
+fichier,url,telecharge_le_utc
+banque_de_france.json,https://api.db.nomics.world/v22/series/BDF/FM/D.FR.EUR.FR2.BB.FRMOYTEC10.HSTA?observations=1,2026-10-23T14:31:15+00:00
+bundesbank.csv,https://www.bundesbank.de/statistic-rmi/StatisticDownload?tsId=BBSIS.D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A&its_csvFormat=en&its_fileFormat=csv&mode=its&its_from=2016-01-01,2026-10-23T14:31:15+00:00
+banco_de_espana.csv,https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/ti_1_3.csv,2026-10-23T14:31:15+00:00

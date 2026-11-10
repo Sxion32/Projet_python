@@ -118,6 +118,7 @@ def fetch_eurostat_monthly(refresh: bool = False) -> pd.DataFrame:
 
 RAW_DIR.mkdir(parents=True, exist_ok=True) #permet de creer de l'arborescence des dossier si elle n'exsite pas entre 
 
-fetch_cnbc(refresh=True) #"refresh=True" permet de forcer le téléchargement des données même si elles existent déjà encore 
-fetch_bundesbank(refresh=True)
-fetch_eurostat_monthly(refresh=True)
+refresh = False
+fetch_cnbc(refresh) #"refresh=True" permet de forcer le téléchargement des données même si elles existent déjà encore 
+fetch_bundesbank(refresh)
+fetch_eurostat_monthly(refresh)

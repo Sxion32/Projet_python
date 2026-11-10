@@ -4,22 +4,24 @@ from __future__ import annotations
 
 import json
 from datetime import date
-
 from pathlib import Path
 
 import pandas as pd
 import requests
 
+
+#definition des chemisn d'accès aux données 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
-COUNTRIES = ["FR", "DE", "IT", "ES"]
-RAW_DIR = DATA_DIR / "raw"
+COUNTRIES = ["FR", "DE", "IT", "ES"] #périmètre d'étude : France, Allemagne, Italien Espagne 
+RAW_DIR = DATA_DIR / "raw" #dossier dédié au stockage des données brutes 
 START_DATE = pd.Timestamp("2016-01-01")
 
-
+#paramètres des requêtes HTTP pour l'importation des données
 HEADERS = {"User-Agent": "Mozilla/5.0 (projet ENSAE - spreads souverains)"}
 TIMEOUT = 60
 
+#definition des urls pour l'importation des données
 CNBC_SYMBOLS = {c: f"{c}10Y-{c}" for c in COUNTRIES}
 CNBC_URL = (
     "https://ts-api.cnbc.com/harmony/app/bars/{symbol}/1D/"
@@ -37,17 +39,17 @@ EUROSTAT_URL = (
 
 def _get(url: str) -> requests.Response:
     response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
-    response.raise_for_status()
+    response.raise_for_status() #permet de lever une exeption ; si le statut HTTP indique unne erreur 
     return response
 
 
-
+#Création d'extraction par source des données 
 # CNBC
 
 def fetch_cnbc_country(country: str, refresh: bool = False) -> pd.Series:
     """Rendement à 10 ans journalier (clôture, en %) d'un pays."""
     cache = RAW_DIR / f"cnbc_{country}10Y.json"
-    if refresh or not cache.exists():
+    if refresh or not cache.exists(): #mécanisme de cache : on ne télécharge les données que si le fichier n'existe pas ou si on demande un rafraichissement
         url = CNBC_URL.format(
             symbol=CNBC_SYMBOLS[country],
             start=START_DATE.strftime("%Y%m%d"),
@@ -55,11 +57,11 @@ def fetch_cnbc_country(country: str, refresh: bool = False) -> pd.Series:
         )
         cache.write_text(_get(url).text)
 
-    bars = json.loads(cache.read_text())["barData"]["priceBars"]
+    bars = json.loads(cache.read_text())["barData"]["priceBars"] 
     series = pd.Series(
         {pd.Timestamp(bar["tradeTime"][:8]): float(bar["close"]) for bar in bars},
         name=country,
-    )
+    ) 
     return series.sort_index()
 
 
@@ -67,7 +69,7 @@ def fetch_cnbc(refresh: bool = False) -> pd.DataFrame:
     """Tableau (dates x pays) des rendements à 10 ans CNBC, en %."""
     frame = pd.concat(
         [fetch_cnbc_country(c, refresh=refresh) for c in COUNTRIES], axis=1
-    )
+    ) #on cacaténe les séries de chaque pays en colonnes pour former un tableau
     frame.index.name = "date"
     return frame
 
@@ -87,10 +89,10 @@ def fetch_bundesbank(refresh: bool = False) -> pd.Series:
         names=["date", "value", "flag"],
         na_values=["."],
         encoding="utf-8-sig",
-    )
-    raw["date"] = pd.to_datetime(raw["date"], errors="coerce")
+    ) #lecture du CSV en ignorant les 9 premières lignes (en-tête) et en définissant les noms de colonnes
+    raw["date"] = pd.to_datetime(raw["date"], errors="coerce")  # on nettoie la colonne date en convertissant les valeurs en datetime, les valeurs invalides deviennent NaT
     series = raw.dropna(subset=["date", "value"]).set_index("date")["value"]
-    series = pd.to_numeric(series, errors="coerce").dropna()
+    series = pd.to_numeric(series, errors="coerce").dropna() #on convertit les valeurs en numérique, les valeurs invalides deviennent NaN et sont supprimées
     return series.loc[START_DATE:].rename("DE_bundesbank")
 
 
@@ -106,15 +108,16 @@ def fetch_eurostat_monthly(refresh: bool = False) -> pd.DataFrame:
         cache.write_bytes(_get(url).content)
 
     raw = pd.read_csv(cache)
-    frame = raw.pivot(index="TIME_PERIOD", columns="geo", values="OBS_VALUE")
+    frame = raw.pivot(index="TIME_PERIOD", columns="geo", values="OBS_VALUE") #permet de passer d'un format long à un format large, avec les périodes en index et les pays en colonnes
     frame.index = pd.PeriodIndex(frame.index, freq="M")
-    frame.index.name = "mois"
+    frame.index.name = "mois" #on convertit l'index en période mensuelle et on le nomme "mois"
     return frame[COUNTRIES]
 
 
 # Appel des fonctions pour récupérer les données
 
-RAW_DIR.mkdir(parents=True, exist_ok=True)
-fetch_cnbc(refresh=True)
+RAW_DIR.mkdir(parents=True, exist_ok=True) #permet de creer de l'arborescence des dossier si elle n'exsite pas entre 
+
+fetch_cnbc(refresh=True) #"refresh=True" permet de forcer le téléchargement des données même si elles existent déjà encore 
 fetch_bundesbank(refresh=True)
 fetch_eurostat_monthly(refresh=True)

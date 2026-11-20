@@ -29,14 +29,11 @@ TABLE_DIR = OUTPUTS_DIR / "tables"
 # disponible dans les données (pas de date de fin fixée).
 START_DATE = pd.Timestamp("2016-01-01")
 
-# Pays dont nous collectons les taux à 10 ans. L'Italie est gardée pour l'instant :
-# son maintien dans le périmètre reste à trancher entre nous.
+# Pays dont nous collectons les taux à 10 ans
 COUNTRIES = ["FR", "DE", "IT", "ES"]
 BENCHMARK = "DE"  # dénominateur des spreads : le Bund allemand
 
-# Une couleur fixe par pays, la même dans tous les graphiques. Palette vérifiée
-# pour les daltonismes ; l'aqua de l'Italie est peu contrastée sur fond blanc,
-# donc nos graphiques gardent toujours une légende.
+# Une couleur fixe par pays, la même dans tous les graphiques.
 COLORS = {
     "FR": "#2a78d6",  # bleu
     "ES": "#eb6834",  # orange

@@ -23,6 +23,10 @@ Nous partons du 1er janvier 2016, soit l'année précédant l'élection d'Emmanu
 .
 ├── main.ipynb              # Rapport (livrable principal)
 ├── main.py                 # Exécute toute la chaîne et exporte tableaux et figures
+├── spreads/
+│   ├── config.py           # Constantes : chemins, période, pays, couleurs, date de rupture
+├── docs/
+│   ├── journal_decisions.md # Choix de méthode, alternatives écartées et biais
 ├── data/
 │   ├── ...                 # les données avant traitement 
 ├── outputs/

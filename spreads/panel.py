@@ -1,22 +1,24 @@
 #dans ce script, on transforme les taux bruts en spreads souverains et on prépare le tableau qui regrouppent les données afin de l'utilisé par la suite. 
 #On utilise les données nétoyées. 
 
-import pandas as pd
+from pathlib import Path
+import sys
 
+
+import pandas as pd
 from spreads import config
 
 
-def compute_spreads(yields: pd.DataFrame) -> pd.DataFrame:
-    """Calcule les spreads à 10 ans contre le Bund allemand, en points de base."""
-    spread_countries = [c for c in config.COUNTRIES if c != config.BENCHMARK]
+def compute_spreads(yields):
+    """Calcule les spreads (en points de base) par rapport à l'Allemagne."""
     spreads = pd.DataFrame(index=yields.index)
-    for country in spread_countries:
-        spreads[f"s_{country}"] = (yields[country] - yields[config.BENCHMARK]) * 100
+    for country in ["FR", "IT", "ES"]:
+        spreads[f"s_{country}"] = (yields[country] - yields["DE"]) * 100
     return spreads
 
 
-def build_panel(yields: pd.DataFrame, export: bool = True) -> pd.DataFrame:
-    """Réunit rendements (%) et spreads (pb) dans un seul DataFrame et l'exporte."""
+def build_panel(yields, export=True):
+    """Regroupe les rendements et les spreads dans un seul tableau."""
     spreads = compute_spreads(yields)
     panel = pd.concat([yields, spreads], axis=1)
     panel.index.name = "date"
@@ -27,3 +29,13 @@ def build_panel(yields: pd.DataFrame, export: bool = True) -> pd.DataFrame:
 
     return panel
 
+
+if __name__ == "__main__":
+    yields = pd.read_csv(
+        config.DATA_DIR / "cleaned" / "yields_10y_cnbc_daily.csv",
+        index_col=0,
+        parse_dates=True,
+    )
+    panel = build_panel(yields, export=True)
+    print(panel.tail())
+    print("Spread FR le 07/06/2024 :", round(panel.loc["2024-06-07", "s_FR"], 2), "pb")

@@ -1,18 +1,11 @@
 # Dans ce script, on nettoie les données brutes (data/raw) et on les enregistre dans data/cleaned
 
 import json
-from pathlib import Path
 
 import pandas as pd
 
+from spreads_souverains.config import CLEANED_DIR, COUNTRIES, RAW_DIR, START_DATE
 
-# définition des chemins d'accès 
-ROOT = Path(__file__).resolve().parents[1]
-RAW_DIR = ROOT / "data" / "raw"          # données brutes
-CLEANED_DIR = ROOT / "data" / "cleaned"  # données nettoyées
-
-COUNTRIES = ["FR", "DE", "IT", "ES"] 
-START_DATE = pd.Timestamp("2016-01-01")
 FFILL_LIMIT = 2  # on comble au plus 2 jours ouvrés manquants d'affilée
 
 
@@ -135,22 +128,12 @@ def check_monthly(frame, name):
 
 
 
-# 4. Programme principal
+# 4. Enregistrement
 
-CLEANED_DIR.mkdir(parents=True, exist_ok=True)
-
-cnbc, cnbc_filled = clean_yields(load_cnbc())
-check_daily(cnbc, cnbc_filled, "CNBC 10 ans")
-
-bundesbank, bundesbank_filled = clean_yields(load_bundesbank())
-check_daily(bundesbank, bundesbank_filled, "Bundesbank DE 10 ans")
-
-eurostat = clean_monthly(load_eurostat())
-check_monthly(eurostat, "Eurostat 10 ans (mensuel)")
-
-# enregistrement (4 à décimales près)
-cnbc.to_csv(CLEANED_DIR / "yields_10y_cnbc_daily.csv", float_format="%.4f")
-bundesbank.to_csv(CLEANED_DIR / "de10y_bundesbank_daily.csv", float_format="%.4f")
-eurostat.to_csv(CLEANED_DIR / "yields_10y_eurostat_monthly.csv", float_format="%.4f")
-print(f"\nFichiers enregistrés dans {CLEANED_DIR}")
-
+def save_cleaned(cnbc, bundesbank, eurostat):
+    """Enregistre les trois tableaux nettoyés dans data/cleaned/ (4 décimales)."""
+    CLEANED_DIR.mkdir(parents=True, exist_ok=True)
+    cnbc.to_csv(CLEANED_DIR / "yields_10y_cnbc_daily.csv", float_format="%.4f")
+    bundesbank.to_csv(CLEANED_DIR / "de10y_bundesbank_daily.csv", float_format="%.4f")
+    eurostat.to_csv(CLEANED_DIR / "yields_10y_eurostat_monthly.csv", float_format="%.4f")
+    print(f"\nFichiers enregistrés dans {CLEANED_DIR}")

@@ -23,7 +23,7 @@ marquée « en cours » n'est pas encore tranchée.
 
 - **Décision.** Les statistiques descriptives par période utilisent deux sous-périodes :
   du 1er janvier 2016 au 9 juin 2024, puis du 10 juin 2024 à la dernière séance
-  disponible (`PERIODS` dans `spreads/config.py`).
+  disponible (`PERIODS` dans `spreads_souverains/config.py`).
 - **Alternative écartée.** Un découpage plus fin (2016-2019, Covid 2020-2021, hausse des
   taux de 2022 à juin 2024, après la dissolution). Il serait plus riche, mais chaque borne
   demanderait sa propre justification par un événement daté indépendamment.

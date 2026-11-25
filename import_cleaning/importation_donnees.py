@@ -4,18 +4,12 @@ from __future__ import annotations
 
 import json
 from datetime import date
-from pathlib import Path
 
 import pandas as pd
 import requests
 
+from spreads_souverains.config import COUNTRIES, RAW_DIR, START_DATE
 
-#definition des chemisn d'accès aux données 
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "data"
-COUNTRIES = ["FR", "DE", "IT", "ES"] #périmètre d'étude : France, Allemagne, Italien Espagne 
-RAW_DIR = DATA_DIR / "raw" #dossier dédié au stockage des données brutes 
-START_DATE = pd.Timestamp("2016-01-01")
 
 #paramètres des requêtes HTTP pour l'importation des données
 HEADERS = {"User-Agent": "Mozilla/5.0 (projet ENSAE - spreads souverains)"}
@@ -55,6 +49,7 @@ def fetch_cnbc_country(country: str, refresh: bool = False) -> pd.Series:
             start=START_DATE.strftime("%Y%m%d"),
             end=date.today().strftime("%Y%m%d"),
         )
+        cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_text(_get(url).text)
 
     bars = json.loads(cache.read_text())["barData"]["priceBars"] 
@@ -80,6 +75,7 @@ def fetch_bundesbank(refresh: bool = False) -> pd.Series:
     """Taux à 10 ans des titres fédéraux allemands (Svensson), en %."""
     cache = RAW_DIR / "bundesbank_10y.csv"
     if refresh or not cache.exists():
+        cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_bytes(_get(BUNDESBANK_URL).content)
 
     raw = pd.read_csv(
@@ -105,6 +101,7 @@ def fetch_eurostat_monthly(refresh: bool = False) -> pd.DataFrame:
         url = EUROSTAT_URL.format(
             geos="+".join(COUNTRIES), start=START_DATE.strftime("%Y-%m")
         )
+        cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_bytes(_get(url).content)
 
     raw = pd.read_csv(cache)
@@ -112,13 +109,3 @@ def fetch_eurostat_monthly(refresh: bool = False) -> pd.DataFrame:
     frame.index = pd.PeriodIndex(frame.index, freq="M")
     frame.index.name = "mois" #on convertit l'index en période mensuelle et on le nomme "mois"
     return frame[COUNTRIES]
-
-
-# Appel des fonctions pour récupérer les données
-
-RAW_DIR.mkdir(parents=True, exist_ok=True) #permet de creer de l'arborescence des dossier si elle n'exsite pas entre 
-
-refresh = False
-fetch_cnbc(refresh) #"refresh=True" permet de forcer le téléchargement des données même si elles existent déjà encore 
-fetch_bundesbank(refresh)
-fetch_eurostat_monthly(refresh)

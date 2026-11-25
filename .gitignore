@@ -1,0 +1,14 @@
+# Fichiers créés automatiquement par macOS
+.DS_Store
+
+# Fichiers compilés créés automatiquement par Python
+__pycache__/
+*.pyc
+
+# Sauvegardes automatiques de Jupyter
+.ipynb_checkpoints/
+
+# Environnements virtuels et secrets
+.venv/
+venv/
+.env

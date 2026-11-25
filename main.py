@@ -1,1 +1,86 @@
-import numpy
+# Exécute toute la chaîne du projet, de la collecte des données aux figures.
+
+import matplotlib.pyplot as plt
+
+from import_cleaning import cleaning, import_titres, importation_donnees, nettoyage_titres
+from scripts import detect_ev, graph_nb_art_jour
+from spreads_souverains import config, controles, panel
+from spreads_souverains import events as events_marche
+
+
+def importer_taux():
+    # 1. Taux à 10 ans bruts : CNBC, Bundesbank et Eurostat (dans data/raw/).
+    importation_donnees.fetch_cnbc(config.REFRESH)
+    importation_donnees.fetch_bundesbank(config.REFRESH)
+    importation_donnees.fetch_eurostat_monthly(config.REFRESH)
+
+
+def nettoyer_taux():
+    # 2. Nettoyage des taux et enregistrement dans data/cleaned/.
+    cnbc, cnbc_filled = cleaning.clean_yields(cleaning.load_cnbc())
+    cleaning.check_daily(cnbc, cnbc_filled, "CNBC 10 ans")
+
+    bundesbank, bundesbank_filled = cleaning.clean_yields(cleaning.load_bundesbank())
+    cleaning.check_daily(bundesbank, bundesbank_filled, "Bundesbank DE 10 ans")
+
+    eurostat = cleaning.clean_monthly(cleaning.load_eurostat())
+    cleaning.check_monthly(eurostat, "Eurostat 10 ans (mensuel)")
+
+    cleaning.save_cleaned(cnbc, bundesbank, eurostat)
+    return cnbc
+
+
+def construire_panel(cnbc):
+    #3. Spreads contre l'Allemagne, enregistrés dans data/yields.csv.
+    tableau = panel.build_panel(cnbc, export=True)
+    print(tableau.tail())
+    print("Spread FR le 07/06/2024 :", round(tableau.loc["2024-06-07", "s_FR"], 2), "pb")
+    return tableau
+
+
+def importer_titres():
+    #4. Titres France Info via Media Cloud (plusieurs heures), puis filtrage des titres politiques.
+    if config.REFRESH or not import_titres.FICHIER_SORTIE.exists():
+        annuaire, recherche = import_titres.connexion_mediacloud()
+        ids_franceinfo = import_titres.trouver_ids_franceinfo(annuaire)
+        import_titres.collecter_titres(recherche, ids_franceinfo)
+        titres = import_titres.dedoublonner_titres()
+        if titres is not None:
+            import_titres.afficher_statistiques(titres)
+
+    nettoyage_titres.filtrer_titres_politiques()
+    graph_nb_art_jour.tracer_articles_par_jour()
+
+
+def detecter_evenements(cnbc):
+    #5. Pics d'articles politiques : outputs/tables/events.csv et outputs/figures/events_graphique.png.
+    base = detect_ev.charger_titres()
+    jours = detect_ev.reperer_pics(detect_ev.compter_articles_par_jour(base))
+    pics = detect_ev.regrouper_pics(jours)
+    events = detect_ev.construire_events(base, pics)
+    events = events_marche.add_reaction_dates(events, cnbc.index)
+    detect_ev.enregistrer_events(events)
+    detect_ev.tracer_events(jours, events)
+
+
+def controler_donnees():
+    #6. Fiabilité de CNBC et grosses variations des spreads (figures dans outputs/figures/).
+    cnbc, bundesbank, eurostat = controles.charger_donnees_nettoyees()
+    controles.comparer_eurostat(cnbc, eurostat)
+    controles.comparer_bundesbank(cnbc, bundesbank)
+    controles.compter_jours_combles()
+
+    spreads = controles.calculer_spreads(cnbc)
+    controles.confronter_variations_evenements(spreads)
+    controles.histogramme_spread_fr(spreads)
+
+
+"""
+importer_taux()
+cnbc = nettoyer_taux()
+construire_panel(cnbc)
+detecter_evenements(cnbc)
+controler_donnees()
+plt.close("all")
+"""
+importer_titres()

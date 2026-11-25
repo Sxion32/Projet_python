@@ -6,7 +6,7 @@ import sys
 
 
 import pandas as pd
-from spreads import config
+from spreads_souverains import config
 
 
 def compute_spreads(yields): #Calcule les spreads  par rapport à l'Allemagne. (ne point de base)
@@ -25,14 +25,3 @@ def build_panel(yields, export=True): #regroupe les données de taux dans un seu
         panel.to_csv(config.DATA_DIR / "yields.csv", float_format="%.4f")
 
     return panel
-
-
-if __name__ == "__main__": 
-    yields = pd.read_csv(
-        config.DATA_DIR / "cleaned" / "yields_10y_cnbc_daily.csv",
-        index_col=0,
-        parse_dates=True,
-    ) #création de notre tableau dans data/raw appelé yealds.csv 
-    panel = build_panel(yields, export=True) #controle pour vérifier si les spreads sont bien calculés.
-    print(panel.tail())
-    print("Spread FR le 07/06/2024 :", round(panel.loc["2024-06-07", "s_FR"], 2), "pb")

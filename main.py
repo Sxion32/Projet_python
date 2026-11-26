@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from import_cleaning import cleaning, import_titres, importation_donnees, nettoyage_titres
 from scripts import detect_ev, graph_nb_art_jour
-from spreads_souverains import config, controles, panel
+from spreads_souverains import config, controles, descriptives, indice_articles, panel
 from spreads_souverains import events as events_marche
 
 
@@ -75,12 +75,26 @@ def controler_donnees():
     controles.histogramme_spread_fr(spreads)
 
 
+
+def analyser_indice_articles():
+    #7. Indice quotidien d'articles politiques et corrélation avec les variations du spread français.
+    tableau = descriptives.charger_panel()
+    indice = indice_articles.construire_indice(indice_articles.charger_titres(), tableau.index)
+    variations = indice_articles.variations_absolues(tableau)
+    correlations = indice_articles.tableau_correlations(indice, variations)
+    print(correlations)
+    indice_articles.enregistrer_indice(indice, correlations)
+    indice_articles.tracer_indice(indice, variations)
+    indice_articles.tracer_classes(indice_articles.variations_par_classe(indice, variations))
+
+
 """
 importer_taux()
 cnbc = nettoyer_taux()
 construire_panel(cnbc)
 detecter_evenements(cnbc)
 controler_donnees()
+importer_titres()
+analyser_indice_articles()
 plt.close("all")
 """
-importer_titres()

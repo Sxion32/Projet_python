@@ -23,7 +23,7 @@ def load_cnbc():
         values = [float(bar["close"]) for bar in bars]                # le taux de fin de journée est converti en float
         series.append(pd.Series(values, index=dates, name=country))   # Rajout du pays à la série
 
-    frame = pd.concat(series, axis=1)  # une colonne par pays
+    frame = pd.concat(series, axis=1, sort=True)  # une colonne par pays
     frame = frame.sort_index()
     frame.index.name = "date"
     return frame

@@ -63,8 +63,8 @@ def fetch_cnbc_country(country: str, refresh: bool = False) -> pd.Series:
 def fetch_cnbc(refresh: bool = False) -> pd.DataFrame:
     """Tableau (dates x pays) des rendements à 10 ans CNBC, en %."""
     frame = pd.concat(
-        [fetch_cnbc_country(c, refresh=refresh) for c in COUNTRIES], axis=1
-    ) #on cacaténe les séries de chaque pays en colonnes pour former un tableau
+        [fetch_cnbc_country(c, refresh=refresh) for c in COUNTRIES], axis=1, sort=True
+    ) #on concatène les séries de chaque pays en colonnes pour former un tableau (dates triées)
     frame.index.name = "date"
     return frame
 

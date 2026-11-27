@@ -49,3 +49,9 @@ PERIODS = {
 # False : on lit les fichiers de data/raw/ sans rien télécharger.
 # True : on retélécharge les données brutes (connexion internet nécessaire).
 REFRESH = False
+
+# Valeurs CNBC erronées, retirées au nettoyage puis comblées comme un jour manquant.
+# Fin novembre 2022, le taux français monte de 18,5 pb en une séance puis revient à son
+# niveau deux jours plus tard, sans mouvement des autres pays : ces deux valeurs sont les
+# seules à 4 décimales (contre 3 autour), signe d'une autre obligation ou d'une autre source.
+ANOMALIES_CNBC = {"FR": ["2022-11-28", "2022-11-29"]}

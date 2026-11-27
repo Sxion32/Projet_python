@@ -4,7 +4,7 @@ import json
 
 import pandas as pd
 
-from spreads_souverains.config import CLEANED_DIR, COUNTRIES, RAW_DIR, START_DATE
+from spreads_souverains.config import ANOMALIES_CNBC, CLEANED_DIR, COUNTRIES, RAW_DIR, START_DATE
 
 FFILL_LIMIT = 2  # on comble au plus 2 jours ouvrés manquants d'affilée
 
@@ -58,6 +58,14 @@ def load_eurostat():
 
 
 # 2. Nettoyage
+
+def retirer_anomalies(raw, anomalies=ANOMALIES_CNBC):
+    """Remplace par NaN les valeurs erronées listées dans config.ANOMALIES_CNBC (pays -> dates)."""
+    frame = raw.copy()
+    for country, dates in anomalies.items():
+        frame.loc[pd.to_datetime(dates), country] = float("nan")
+    return frame
+
 
 def clean_yields(raw):
     """Nettoie un tableau journalier de taux.

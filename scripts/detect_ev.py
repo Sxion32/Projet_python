@@ -122,8 +122,8 @@ def mots_caracteristiques(titres_du_jour, compteur_global, nb_jours_total, combi
         if nb >= 3:                                         # au moins 3 titres ce jour-là
             moyenne_par_jour = compteur_global[mot] / nb_jours_total
             scores[mot] = nb / (moyenne_par_jour + 1)       # combien de fois plus que d'habitude
-    # On trie les mots du score le plus élevé au plus faible
-    scores = pd.Series(scores).sort_values(ascending=False)
+    # On trie les mots du score le plus élevé au plus faible (à égalité, par ordre alphabétique)
+    scores = pd.Series(scores).sort_index().sort_values(ascending=False, kind="stable")
     return list(scores.index[:combien])
 
 # Choisir les titres les plus représentatifs : ceux qui contiennent le plus de mots-clés de l'événement (sans garder deux fois le même titre)

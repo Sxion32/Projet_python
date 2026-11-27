@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from import_cleaning import cleaning, import_titres, importation_donnees, nettoyage_titres
 from scripts import detect_ev, graph_nb_art_jour
 from spreads_souverains import config, controles, descriptives, indice_articles, panel
-from spreads_souverains import events as events_marche
 
 
 def importer_taux():
@@ -17,7 +16,7 @@ def importer_taux():
 
 def nettoyer_taux():
     # 2. Nettoyage des taux et enregistrement dans data/cleaned/.
-    cnbc, cnbc_filled = cleaning.clean_yields(cleaning.load_cnbc())
+    cnbc, cnbc_filled = cleaning.clean_yields(cleaning.retirer_anomalies(cleaning.load_cnbc()))
     cleaning.check_daily(cnbc, cnbc_filled, "CNBC 10 ans")
 
     bundesbank, bundesbank_filled = cleaning.clean_yields(cleaning.load_bundesbank())
@@ -52,13 +51,13 @@ def importer_titres():
     graph_nb_art_jour.tracer_articles_par_jour()
 
 
-def detecter_evenements(cnbc):
+def detecter_evenements():
     #5. Pics d'articles politiques : outputs/tables/events.csv et outputs/figures/events_graphique.png.
+    # La date de réaction du marché est recalculée à chaque lecture (spreads_souverains/events.py).
     base = detect_ev.charger_titres()
     jours = detect_ev.reperer_pics(detect_ev.compter_articles_par_jour(base))
     pics = detect_ev.regrouper_pics(jours)
     events = detect_ev.construire_events(base, pics)
-    events = events_marche.add_reaction_dates(events, cnbc.index)
     detect_ev.enregistrer_events(events)
     detect_ev.tracer_events(jours, events)
 
@@ -67,7 +66,9 @@ def controler_donnees():
     #6. Fiabilité de CNBC et grosses variations des spreads (figures dans outputs/figures/).
     cnbc, bundesbank, eurostat = controles.charger_donnees_nettoyees()
     controles.comparer_eurostat(cnbc, eurostat)
+    controles.tracer_ecarts_eurostat(cnbc, eurostat)
     controles.comparer_bundesbank(cnbc, bundesbank)
+    controles.tracer_nuage_bundesbank(cnbc, bundesbank)
     controles.compter_jours_combles()
 
     spreads = controles.calculer_spreads(cnbc)
@@ -88,13 +89,12 @@ def analyser_indice_articles():
     indice_articles.tracer_classes(indice_articles.variations_par_classe(indice, variations))
 
 
-"""
-importer_taux()
-cnbc = nettoyer_taux()
-construire_panel(cnbc)
-detecter_evenements(cnbc)
-controler_donnees()
-importer_titres()
-analyser_indice_articles()
-plt.close("all")
-"""
+if __name__ == "__main__":
+    importer_taux()
+    cnbc = nettoyer_taux()
+    construire_panel(cnbc)
+    detecter_evenements()
+    controler_donnees()
+    importer_titres()
+    analyser_indice_articles()
+    plt.close("all")

@@ -10,6 +10,8 @@ import pandas as pd
 from spreads_souverains import config
 from spreads_souverains.events import load_events
 
+FFILL_LIMIT = 2  # même règle que import_cleaning/cleaning.py : au plus 2 jours comblés d'affilée
+
 
 def save_figure(fig, filename):
     """Enregistre une figure en PNG dans outputs/figures/"""
@@ -57,6 +59,25 @@ def comparer_eurostat(cnbc, eurostat):
     return fig
 
 
+def tracer_ecarts_eurostat(cnbc, eurostat):
+    """Figure 1b : écart absolu moyen CNBC - Eurostat par pays, en barres (pb)."""
+    gap_monthly = (cnbc.resample("MS").mean() - eurostat).dropna() * 100
+    ecart_abs_moyen = gap_monthly[config.COUNTRIES].abs().mean()
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(config.COUNTRIES, ecart_abs_moyen, color=[config.COLORS[c] for c in config.COUNTRIES])
+    ax.axhline(1, color="black", linestyle="--", linewidth=1, label="1 pb")
+    for position, valeur in enumerate(ecart_abs_moyen):
+        ax.text(position, valeur + 0.05, f"{valeur:.1f}", ha="center")  # valeur au-dessus de la barre
+    ax.set_title("Figure 1b : écart absolu moyen CNBC - Eurostat par pays")
+    ax.set_ylabel("Points de base")
+    ax.grid(alpha=0.3, axis="y")
+    ax.legend()
+    fig.tight_layout()
+    save_figure(fig, "1b_ecart_abs_moyen_eurostat")
+    return fig
+
+
 # CNBC contre Bundesbank (journalier, Bund allemand)
 
 def comparer_bundesbank(cnbc, bundesbank):
@@ -84,6 +105,28 @@ def comparer_bundesbank(cnbc, bundesbank):
     return fig
 
 
+def tracer_nuage_bundesbank(cnbc, bundesbank):
+    """Figure 2b : variations quotidiennes du Bund, CNBC contre Bundesbank (pb), à 1 et 2 jours."""
+    daily = pd.DataFrame({"cnbc": cnbc["DE"], "bundesbank": bundesbank["DE_bundesbank"]}).dropna()
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5), sharex=True, sharey=True)
+    for ax, step in zip(axes, [1, 2]):
+        changes = daily.diff(step).dropna() * 100  # variations en points de base
+        correlation = changes["cnbc"].corr(changes["bundesbank"])
+        ax.scatter(changes["bundesbank"], changes["cnbc"], s=6, alpha=0.3, color=config.COLORS["DE"])
+        ax.axline((0, 0), slope=1, color="black", linewidth=0.8, label="CNBC = Bundesbank")
+        jours = "1 jour" if step == 1 else f"{step} jours"
+        ax.set_title(f"Variations à {jours} : corrélation de {correlation:.2f}".replace(".", ","))
+        ax.set_xlabel("Bundesbank (pb)")
+        ax.grid(alpha=0.3)
+        ax.legend()
+    axes[0].set_ylabel("CNBC (pb)")
+    fig.suptitle("Figure 2b : variations du taux allemand à 10 ans, CNBC contre Bundesbank")
+    fig.tight_layout()
+    save_figure(fig, "2b_nuage_variations_bundesbank")
+    return fig
+
+
 # Nombre de jours comblés par pays et par année
 
 def compter_jours_combles():
@@ -96,9 +139,11 @@ def compter_jours_combles():
     cnbc_raw = pd.DataFrame(raw_series).sort_index().loc[config.START_DATE:]
     cnbc_raw = cnbc_raw[cnbc_raw.index.dayofweek < 5]
     cnbc_raw = cnbc_raw.reindex(pd.bdate_range(cnbc_raw.index.min(), cnbc_raw.index.max()))
+    for country, dates in config.ANOMALIES_CNBC.items():  # valeurs erronées, retirées au nettoyage
+        cnbc_raw.loc[pd.to_datetime(dates), country] = float("nan")
 
     # Un jour est "comblé" s'il était vide avant ffill et rempli après
-    comble = cnbc_raw.isna() & cnbc_raw.ffill(limit=2).notna()
+    comble = cnbc_raw.isna() & cnbc_raw.ffill(limit=FFILL_LIMIT).notna()
     par_annee = comble.groupby(comble.index.year).sum()
     print("\nJours comblés par pays et par année :")
     print(par_annee)

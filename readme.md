@@ -72,6 +72,12 @@ Données jusqu'au 9 novembre 2026.
 - Ce sont les crises de gouvernement (dissolution, 49.3, démission d'un Premier ministre) qui font réagir le spread, pas l'actualité politique ordinaire : la corrélation entre l'indice d'actualité et l'ampleur des variations n'est que de 0,06.
 - Le spread français a changé de niveau : la France emprunte plus cher que l'Espagne depuis septembre 2024 et que l'Italie depuis octobre 2025.
 
+## L'utilisation de l'intelligence artificielle
+
+Au cours de ce projet, nous avons utiliser des outils d'IA générative comme une aide ponctuelle principalement pour comprendre des messages d'erreurs, retrouver plus facilement les bonnes syntaxes de code et repérer des incohérences. 
+
+La conception de la problématique et les choix de fond restent les nôtres.
+
 ## Lancement
 
 Depuis la racine du dépôt :
